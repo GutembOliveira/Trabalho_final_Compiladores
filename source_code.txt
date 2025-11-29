@@ -1,0 +1,11 @@
+function soma(a, b) -> number {
+        var resultado = a + b;
+        return resultado;
+    }
+
+    const x = 10;
+    let y = "hello"; // 'let' será tratado como IDENT, pois não é palavra-chave
+
+    if (x > 5) {
+        println("Maior que 5");
+    }
