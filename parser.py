@@ -67,7 +67,10 @@ class Literal(Node):
     def __init__(self, value):
         self.value = value
     def __repr__(self):
-        return f"Lit({self.value})"
+        if isinstance(self.value, str):
+            return f'Lit("{self.value}")'
+        else:
+            return f"Lit({self.value})"
 
 class Unary(Node):
     def __init__(self, operator, right):

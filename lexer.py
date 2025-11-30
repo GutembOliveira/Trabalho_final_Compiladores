@@ -28,6 +28,13 @@ class Lexer:
         while self.ch in [' ', '\t', '\n', '\r']:
             self._read_char()
 
+    def _skip_comment(self):
+        """Pula todos os caracteres até o final da linha (//)."""
+        # Enquanto não for nova linha E não for fim do arquivo
+        while self.ch != '\n' and self.ch != '':
+            self._read_char()
+        # O self.ch agora é '\n' (ou ''). O _read_char() em next_token irá pular isso.
+
     def next_token(self) -> Token:
         """Retorna o próximo token do código-fonte."""
         self._skip_whitespace()
@@ -66,7 +73,14 @@ class Lexer:
         elif self.ch == '*':
             token = Token(TokenType.ASTERISK, '*')
         elif self.ch == '/':
-            token = Token(TokenType.SLASH, '/')
+            if self._peek_char() == '/':  # Verifica se é //
+                self._read_char()         # Consome o primeiro '/'
+                self._read_char()         # Consome o segundo '/'
+                self._skip_comment()      # Pula o restante da linha
+                return self.next_token()  # Reinicia o ciclo para buscar o próximo token VÁLIDO
+            else:
+                token = Token(TokenType.SLASH, '/')
+
         elif self.ch == '<':
             if self._peek_char() == '=':
                 self._read_char()
@@ -108,6 +122,7 @@ class Lexer:
         elif self.ch == '"':
             literal = self._read_string()
             token = Token(TokenType.STRING, literal)
+            #self._read_char()
         elif self.ch == '':
             token = Token(TokenType.EOF, '')
         else:
@@ -157,4 +172,5 @@ class Lexer:
         while self.ch != '"' and self.ch != '':
             self._read_char()
         literal = self.source[start_pos:self.position]
+        
         return literal

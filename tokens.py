@@ -70,6 +70,7 @@ class Token:
 keywords = {
     "function": TokenType.FUNCTION,
     "var": TokenType.VAR,
+    "let": TokenType.VAR,  # 'let' será tratado como VAR
     "const": TokenType.CONST,
     "if": TokenType.IF,
     "else": TokenType.ELSE,
