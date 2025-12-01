@@ -1,0 +1,42 @@
+// Exemplo com vários erros de sintaxe
+// Este programa contém erros intencionais para demonstrar
+// como o compilador detecta e reporta problemas
+
+// Erro 1: Falta ponto e vírgula
+var x = 10
+var y = 5; // Esta linha pode causar problemas devido ao erro anterior
+
+// Erro 2: Valor faltando após operador de atribuição
+var z = ;
+
+// Erro 3: Parêntese desbalanceado
+if (x > y {
+    var resultado = x + y;
+}
+
+// Erro 4: Operador inválido
+var produto = x ** y; // ** não é suportado
+
+// Erro 5: Estrutura if malformada
+if x > 5) { // Falta parêntese de abertura
+    var temp = 1;
+}
+
+// Erro 6: Chave não fechada
+if (y < 10) {
+    var outro = y * 2;
+// Falta chave de fechamento
+
+// Erro 7: Expressão incompleta
+var incompleta = x +;
+
+// Erro 8: Identificador inválido
+var 123abc = 5; // Não pode começar com número
+
+// Erro 9: String não fechada
+var texto = "Esta string não tem fim
+
+// Erro 10: Operador de comparação inválido
+if (x =< y) { // Deveria ser <= 
+    var comparacao = true;
+}

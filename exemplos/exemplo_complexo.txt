@@ -1,0 +1,79 @@
+// Exemplo de programa complexo
+// Demonstra uso avançado das funcionalidades da linguagem
+
+// Constantes e variáveis
+const LIMITE_INFERIOR = 0;
+const LIMITE_SUPERIOR = 100;
+var contador = 0;
+var acumulador = 0;
+
+// Cálculos matemáticos complexos
+var base = 5;
+var altura = 3;
+var area_retangulo = base * altura;
+var perimetro_retangulo = 2 * (base + altura);
+
+// Expressões condicionais aninhadas
+if (area_retangulo > 10) {
+    if (perimetro_retangulo < 20) {
+        var categoria = "médio";
+        var fator = 1.5;
+    } else {
+        var categoria = "grande";
+        var fator = 2.0;
+    }
+    var valor_final = area_retangulo * fator;
+} else {
+    var categoria = "pequeno";
+    var valor_final = area_retangulo;
+}
+
+// Operações lógicas complexas
+var condicao1 = base > 0 && altura > 0;
+var condicao2 = area_retangulo >= LIMITE_INFERIOR && area_retangulo <= LIMITE_SUPERIOR;
+var condicao_final = condicao1 && condicao2;
+
+if (condicao_final) {
+    // Cálculos baseados em condições
+    var razao = base / altura;
+    var eh_quadrado = (base == altura);
+    
+    if (eh_quadrado) {
+        var tipo = "quadrado";
+        var diagonal = base * 1.414; // Aproximação de sqrt(2)
+    } else {
+        if (base > altura) {
+            var tipo = "retângulo horizontal";
+        } else {
+            var tipo = "retângulo vertical";
+        }
+        // Aproximação da diagonal usando fórmula simplificada
+        var diagonal = (base + altura) * 0.7071; // Aproximação
+    }
+}
+
+// Manipulação de variáveis com operações unárias
+var temp = -base;
+var invertido = !condicao1;
+
+// Reatribuições com expressões complexas
+contador = contador + 1;
+acumulador = acumulador + valor_final;
+
+// Condição final com múltiplas verificações
+if ((contador > 0) && (acumulador > 0) && !invertido) {
+    var sucesso = true;
+    var mensagem = "Processamento concluído com sucesso";
+} else {
+    var sucesso = false;
+    var mensagem = "Erro no processamento";
+}
+
+// Demonstração de precedência de operadores
+var expressao1 = 2 + 3 * 4;           // = 14 (multiplicação primeiro)
+var expressao2 = (2 + 3) * 4;         // = 20 (parênteses primeiro)
+var expressao3 = 10 - 6 / 2;          // = 7 (divisão primeiro)
+var expressao4 = (10 - 6) / 2;        // = 2 (parênteses primeiro)
+
+// Combinação de operadores lógicos e aritméticos
+var resultado_complexo = (expressao1 > expressao2) || (expressao3 == expressao4);

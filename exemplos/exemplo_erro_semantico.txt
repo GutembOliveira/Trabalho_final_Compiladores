@@ -1,0 +1,25 @@
+// Exemplo com erros semânticos
+// Este programa tem sintaxe correta mas contém erros semânticos
+
+// Erro semântico 1: Uso de variável não declarada
+var x = 10;
+var resultado = x + variavel_inexistente;
+
+// Erro semântico 2: Reatribuição de constante
+const PI = 3.14159;
+PI = 3.14; // Erro: não pode modificar constante
+
+// Erro semântico 3: Atribuição para expressão não atribuível
+(x + 5) = 10; // Erro: expressão não é atribuível
+
+// Erro semântico 4: Chamada de função inexistente
+var valor = funcao_inexistente(x);
+
+// Sintaxe correta para comparação
+if (x > 5) {
+    var y = x * 2;
+}
+
+// Uso correto de variáveis declaradas
+var soma = x + 5;
+var produto = soma * 2;

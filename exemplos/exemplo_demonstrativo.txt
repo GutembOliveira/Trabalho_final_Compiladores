@@ -1,0 +1,94 @@
+// Exemplo demonstrativo completo do compilador
+// Mostra todas as funcionalidades implementadas
+
+// ===== DECLARAÇÕES DE VARIÁVEIS =====
+var numero = 42;
+const PI = 3.14159;
+var contador = 0;
+
+// ===== OPERAÇÕES ARITMÉTICAS =====
+var soma = numero + 10;          // 52
+var subtracao = numero - 10;     // 32
+var multiplicacao = numero * 2;  // 84
+var divisao = numero / 2;        // 21
+
+// ===== EXPRESSÕES COMPLEXAS =====
+var formula = (numero + 10) * 2 - numero / 2;  // (52 * 2) - 21 = 83
+var expressao = numero * PI + soma - divisao;  // 42 * 3.14159 + 52 - 21
+
+// ===== OPERAÇÕES LÓGICAS E COMPARAÇÕES =====
+var verdadeiro = true;
+var falso = false;
+var eh_maior = numero > 30;      // true
+var eh_igual = numero == 42;     // true
+var eh_diferente = numero != 50; // true
+var eh_menor_igual = numero <= 100; // true
+
+// ===== EXPRESSÕES LÓGICAS COMPOSTAS =====
+var condicao_e = verdadeiro && eh_maior;        // true && true = true
+var condicao_ou = falso || eh_igual;            // false || true = true
+var condicao_complexa = (numero > 0) && (PI > 3) && (soma < 100);
+
+// ===== OPERADORES UNÁRIOS =====
+var numero_negativo = -numero;    // -42
+var negacao_logica = !verdadeiro; // false
+var dupla_negacao = !!verdadeiro; // true
+
+// ===== ESTRUTURAS CONDICIONAIS SIMPLES =====
+if (numero > 40) {
+    var categoria = 1;  // categoria "alta"
+}
+
+if (PI > 3) {
+    var eh_pi_valido = 1;
+} else {
+    var eh_pi_valido = 0;
+}
+
+// ===== ESTRUTURAS CONDICIONAIS ANINHADAS =====
+if (numero > 0) {
+    if (numero < 50) {
+        var faixa = 1;  // faixa "baixa positiva"
+    } else {
+        var faixa = 2;  // faixa "alta positiva"
+    }
+} else {
+    var faixa = 0;      // faixa "negativa"
+}
+
+// ===== CONDICIONAIS COM EXPRESSÕES COMPLEXAS =====
+if ((numero > 30) && (PI > 3) && (soma < 60)) {
+    var todas_condicoes = 1;
+} else {
+    var algumas_condicoes = 0;
+}
+
+if ((numero < 0) || (PI < 2) || (contador > 10)) {
+    var alguma_condicao_verdadeira = 1;
+} else {
+    var nenhuma_condicao_verdadeira = 0;
+}
+
+// ===== REATRIBUIÇÕES =====
+contador = contador + 1;         // incrementa contador
+numero = numero * 2;             // dobra o número
+soma = soma + contador;          // adiciona contador à soma
+
+// ===== OPERAÇÕES COM PRECEDÊNCIA =====
+var precedencia1 = 2 + 3 * 4;              // = 14 (multiplicação primeiro)
+var precedencia2 = (2 + 3) * 4;            // = 20 (parênteses primeiro)
+var precedencia3 = 10 - 6 / 2 + 1;         // = 8 (divisão primeiro, depois esquerda para direita)
+var precedencia4 = 2 * 3 + 4 * 5;          // = 26 (multiplicações primeiro)
+
+// ===== EXPRESSÕES LÓGICAS COM PRECEDÊNCIA =====
+var logica1 = verdadeiro && falso || verdadeiro;  // (verdadeiro && falso) || verdadeiro = true
+var logica2 = verdadeiro || falso && verdadeiro;  // verdadeiro || (falso && verdadeiro) = true
+
+// ===== COMBINAÇÃO DE OPERAÇÕES ARITMÉTICAS E LÓGICAS =====
+var resultado_final = (numero > soma) || ((PI * 10) > (contador + 20));
+var calculo_complexo = ((numero + soma) / 2) > ((PI * contador) + 10);
+
+// ===== REATRIBUIÇÕES COMPLEXAS =====
+numero = (numero + soma) / 2;
+contador = !condicao_e;  // converter boolean para número
+soma = precedencia1 + precedencia2 + precedencia3;

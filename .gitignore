@@ -1,0 +1,39 @@
+# Arquivos compilados
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Executáveis gerados pelo compilador
+program
+programa_completo
+teste_*
+simples
+completo
+meuapp
+demo
+
+# Arquivos temporários
+*.tmp
+/tmp/
+.DS_Store
+*.swp
+*.swo
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-*
+
+# Logs
+*.log
+
+# OS
+Thumbs.db

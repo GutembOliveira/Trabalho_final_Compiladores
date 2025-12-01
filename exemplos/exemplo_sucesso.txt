@@ -1,0 +1,51 @@
+// Exemplo de programa válido
+// Este programa demonstra as funcionalidades básicas da linguagem
+
+// Declarações de variáveis
+var x = 10;
+var y = 5;
+const PI = 3.14159;
+
+// Operações aritméticas
+var soma = x + y;
+var produto = x * y;
+var divisao = x / y;
+var subtracao = x - y;
+
+// Expressões complexas
+var resultado = (x + y) * 2 - x / y;
+
+// Expressões lógicas
+var maior = x > y;
+var menor_igual = x <= y;
+var iguais = x == y;
+var diferentes = x != y;
+
+// Estruturas condicionais
+if (x > y) {
+    var mensagem = "x é maior que y";
+    var diferenca = x - y;
+}
+
+if (resultado > 20) {
+    var categoria = "alto";
+} else {
+    var categoria = "baixo";
+}
+
+// Expressões condicionais compostas
+if (x > 0 && y > 0) {
+    var ambos_positivos = true;
+}
+
+if (x < 0 || y < 0) {
+    var algum_negativo = true;
+}
+
+// Operações unárias
+var negativo = -x;
+var negacao = !maior;
+
+// Reatribuições
+x = x + 1;
+y = resultado * 2;

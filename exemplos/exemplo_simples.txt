@@ -1,0 +1,4 @@
+// Exemplo muito simples para teste
+var x = 10;
+var y = 5;
+var resultado = x + y * 2;

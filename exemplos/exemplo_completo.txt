@@ -1,0 +1,46 @@
+// Exemplo bem sucedido com operações simples
+var x = 10;
+var y = 5;
+
+// Operações aritméticas
+var soma = x + y;
+var produto = x * y;
+var divisao = x / y;
+var subtracao = x - y;
+
+// Expressões complexas
+var resultado = (x + y) * 2 - x / y;
+
+// Expressões lógicas
+var maior = x > y;
+var menor_igual = x <= y;
+var iguais = x == y;
+var diferentes = x != y;
+
+// Estruturas condicionais
+if (x > y) {
+    var diferenca = x - y;
+}
+
+if (resultado > 20) {
+    var categoria_alta = 1;
+} else {
+    var categoria_baixa = 0;
+}
+
+// Expressões condicionais compostas
+if (x > 0 && y > 0) {
+    var ambos_positivos = 1;
+}
+
+if (x < 0 || y < 0) {
+    var algum_negativo = 1;
+}
+
+// Operações unárias
+var negativo = -x;
+var negacao = !maior;
+
+// Reatribuições
+x = x + 1;
+y = resultado * 2;
