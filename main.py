@@ -1,70 +1,79 @@
 import sys
 
-from antlr4 import FileStream
+# Importe a classe do analisador semântico
+from analisadorSintatico import SemanticAnalyzer
+
 from lexer import Lexer
 from tokens import TokenType
-from antlr4 import FileStream, CommonTokenStream
 from parser import Parser
 
 def main():
-   
+    # Esta função tokenize não é mais usada, mas a mantenho comentada se for um requisito.
+    # def tokenize(source):
+    #     lexer = Lexer(source)
+    #     tokens = []
+    #     tok = lexer.next_token()
+    #     while tok.type != TokenType.EOF:
+    #         tokens.append(tok)
+    #         tok = lexer.next_token()
+    #     tokens.append(tok)  # adiciona o EOF
+    #     return tokens
 
-    def tokenize(source):
-        lexer = Lexer(source)
-        tokens = []
-
-        tok = lexer.next_token()
-        while tok.type != TokenType.EOF:
-            tokens.append(tok)
-            tok = lexer.next_token()
-        tokens.append(tok)  # adiciona o EOF
-
-        return tokens
-
-
-    # source_code = """
-    # function soma(a: number, b: number) -> number {
-    #     var resultado = a + b;
-    #     return resultado;
-    # }
-
-    # const x = 10;
-    # let y = "hello"; // 'let' será tratado como IDENT, pois não é palavra-chave
-
-    # if (x > 5) {
-    #     println("Maior que 5");
-    # }"""
-
-    #Código de exemplo para testar o lexer
-    #filename = sys.argv[1]
+    # 1) LEITURA DO CÓDIGO FONTE
+    # O seu código original já trata da leitura
+    # filename = sys.argv[1] # Se for usar linha de comando
     filename = "source_code.txt"
-    with open(filename, "r") as f:
-       source_code = f.read()
+    try:
+        with open(filename, "r") as f:
+            source_code = f.read()
+    except FileNotFoundError:
+        print(f"Erro: Arquivo '{filename}' não encontrado.")
+        sys.exit(1)
 
-    lexer = Lexer(source_code)
-    lexer_aux = lexer
-
-   
+    # Inicializamos o lexer duas vezes ou resetamos ele
+    # Nota: Em Python, a passagem de objetos pode ser complexa. 
+    # É mais seguro criar uma nova instância para o Parser usar.
     
-    # print("--- Análise Léxica ---")
-    # while True:
-    #     token = lexer.next_token()
-    #     if token.type == TokenType.EOF:
-    #         print(token)
-    #         break
-    #     print(token)
-     # 2) PARSER → AST
-    parser = Parser(lexer_aux)
+    # 2) ANÁLISE LÉXICA
+    # O parser consome os tokens gerados por esta instância do lexer.
+    lexer_for_parser = Lexer(source_code)
+    
+    # 3) ANÁLISE SINTÁTICA → AST
+    print("--- 1. Análise Sintática ---")
+    parser = Parser(lexer_for_parser)
     program = parser.parse_program()
 
-    # 3) Resultados
+    # 4) Resultados da Análise Sintática
     if len(parser.errors) > 0:
-        print("\n=== ERROS DE PARSING ===")
+        print("\n=== ❌ ERROS SINTÁTICOS (PARSING) ===")
         for e in parser.errors:
             print(e)
+        # Se houver erros sintáticos graves, podemos parar a análise.
+        return 
     else:
-        print("\n--- Análise Sintática OK ---")
-        print(program)
-  
+        print("✅ Análise Sintática OK. AST gerada.")
+        # Opcionalmente, imprime a AST:
+        # print("\n--- AST ---")
+        # print(program)
+    
+    # --- INTEGRAÇÃO DA ANÁLISE SEMÂNTICA ---
+    # 5) ANÁLISE SEMÂNTICA
+    print("\n--- 2. Análise Semântica ---")
+    
+    # Cria uma instância do analisador semântico
+    analyzer = SemanticAnalyzer()
+    
+    # Executa a análise no nó raiz da AST
+    semantic_errors = analyzer.analyze(program)
+
+    # 6) Resultados da Análise Semântica
+    if semantic_errors:
+        print("\n=== ⚠️ ERROS SEMÂNTICOS ===")
+        for e in semantic_errors:
+            print(e)
+        print(f"\n❌ Análise Semântica FALHOU com {len(semantic_errors)} erro(s).")
+    else:
+        print("✅ Análise Semântica OK. Não foram encontrados erros de escopo, atribuição, ou declaração.")
+
 if __name__ == "__main__":
     main()

@@ -1,1 +1,27 @@
-var resultado = 10 + 5 * 2;
+// Declaração de constante (não pode ser reatribuída)
+const PI = 3.14159;
+var dia = true
+// Declaração de uma função para calcular a área de um círculo
+function calculateArea(radius) {
+    // Variável let dentro do escopo da função
+    let area = PI * (radius * radius); 
+    return area;
+}
+
+// Declaração de variável de bloco/escopo (pode ser reatribuída)
+let radius = 10;
+
+// Chamada de função e atribuição do resultado
+var circleArea = calculateArea(radius);
+
+// Exemplo de uso de if e redeclaração implícita de 'var' (em JS)
+if (circleArea > 300) {
+    // Variável de escopo de bloco (let)
+    let message = "A área é grande.";
+    
+    // Atualiza a variável var do escopo global/pai
+    circleArea = circleArea + 1; 
+} 
+
+// Demonstração de cálculo simples
+var finalResult = circleArea / 2;
