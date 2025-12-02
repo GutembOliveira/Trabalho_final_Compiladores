@@ -1,0 +1,22 @@
+// Programa simples que funciona corretamente
+var x = 10;
+var y = 20;
+var resultado = x + y;
+
+function soma(a, b) {
+    return a + b;
+}
+
+var total = soma(x, y);
+print(total);
+
+// Teste de condicionais
+if (total > 25) {
+    print("Total é maior que 25");
+} else {
+    print("Total é menor ou igual a 25");
+}
+
+// Teste de expressões complexas
+var complexa = (x * 2 + y) / 5;
+print(complexa);

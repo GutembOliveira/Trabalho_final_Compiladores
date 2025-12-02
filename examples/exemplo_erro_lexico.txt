@@ -1,0 +1,15 @@
+// Exemplos de erros léxicos
+
+// Erro 1: Número com múltiplos pontos decimais
+var numero_invalido = 3.14.159;
+
+// Erro 2: String não fechada
+var string_incorreta = "Hello world;
+
+// Erro 3: Caracteres não suportados
+var teste_arroba = x @ y;
+var teste_hashtag = a # b;
+var teste_cifrao = $variavel;
+
+// Erro 4: Número começando com ponto sem dígitos
+var numero_sem_inicio = .123;

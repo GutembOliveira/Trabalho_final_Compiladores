@@ -1,0 +1,20 @@
+// Programa simples sem print (função não declarada)
+var x = 10;
+var y = 20;
+var resultado = x + y;
+
+function soma(a, b) {
+    return a + b;
+}
+
+var total = soma(x, y);
+
+// Teste de condicionais
+if (total > 25) {
+    var mensagem = "maior";
+} else {
+    var mensagem2 = "menor";
+}
+
+// Teste de expressões complexas
+var complexa = (x * 2 + y) / 5;

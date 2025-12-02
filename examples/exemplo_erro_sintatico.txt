@@ -1,0 +1,26 @@
+// Exemplos de erros sintáticos
+
+// Erro 1: Identificador começando com número
+var 123abc = 10;
+
+// Erro 2: If sem parênteses
+if x > 10 {
+    print(x);
+}
+
+// Erro 3: Expressão vazia em atribuição
+var x = ;
+
+// Erro 4: Operadores consecutivos
+var resultado = a + + b;
+
+// Erro 5: Declaração de variável sem nome
+var = 10;
+
+// Erro 6: Função sem parênteses nos parâmetros
+function teste a, b {
+    return a + b;
+}
+
+// Erro 7: Chamada de função com parênteses não fechados
+var resultado = soma(10, 20;

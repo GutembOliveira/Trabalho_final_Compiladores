@@ -1,0 +1,35 @@
+// Teste de casos limite para o lexer
+
+// 1. Números com problemas
+var numero_invalido = 3.14.159;  // Dois pontos decimais
+var numero_sem_digitos = .;      // Ponto sem dígitos
+var numero_float = 3.;           // Número terminando com ponto
+
+// 2. Strings problemáticas  
+var string_nao_fechada = "hello world;  // String sem fechamento
+var string_vazia = "";                  // String vazia
+var string_com_escape = "hello \"world\""; // Escapes não suportados
+
+// 3. Comentários problemáticos
+/* comentário de bloco não suportado */
+// comentário normal
+//comentário sem espaço
+
+// 4. Operadores problemáticos  
+var teste_operadores = a +++ b;  // Operadores consecutivos
+var teste_assign = a == = b;     // Operadores malformados
+var teste_and = a & b;           // Operador & simples (não &&)
+
+// 5. Identificadores problemáticos
+var 123abc = 10;                 // Começando com número
+var _underscore_ok = 10;         // Com underscore (deveria funcionar)
+var $dollar = 10;                // Com cifrão (não suportado)
+var áçento = 10;                 // Com acentos
+
+// 6. Caracteres especiais não reconhecidos
+var teste = a @ b;               // Caractere @
+var hashtag = a # b;             // Caractere #
+var percent = a % b;             // Módulo não implementado
+
+// 7. Fim de arquivo problemático
+var sem_ponto_virgula = 10
