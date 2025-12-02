@@ -107,6 +107,13 @@ class Index(Node):
         self.index = index
     def __repr__(self):
         return f"Index({self.collection}, {self.index})"
+    
+
+class ArrayLiteral(Node):
+    def __init__(self, elements):
+        self.elements = elements # Lista de expressões
+    def __repr__(self):
+        return f"ArrayLit({self.elements})"
 
 # -----------------------
 # Parser
@@ -350,9 +357,7 @@ class Parser:
     def parse_expression(self, precedence=0):
             left = None
             
-            # --- 1. PREFIX PARSING ---
-            # Note: Não avançamos o token ao final dessas atribuições (exceto nas recursões internas)
-            # O objetivo é terminar esta etapa com cur = "fim do termo esquerdo" e peek = "operador"
+           
             
             if self._cur_is(TokenType.IDENT):
                 left = Identifier(self.cur.literal)
@@ -373,22 +378,20 @@ class Parser:
                 self._next_token()
                 right = self.parse_expression(self._precedence_of(op))
                 left = Unary(op, right)
-                # REMOVIDO: return left (deve cair no loop para permitir !a && b)
-                
+               
             elif self._cur_is(TokenType.LPAREN):
                 self._next_token()
                 left = self.parse_expression()
                 if not self.expect_peek(TokenType.RPAREN):
                     self._synchronize()
                     return left
-                # REMOVIDO: return left (deve cair no loop para permitir (a) + b)
-                
+            elif self._cur_is(TokenType.LBRACKET): # <--- NOVO CÓDIGO AQUI
+                left = self._parse_array_literal()
             else:
                 self.errors.append(f"Erro sintático: token prefixo inesperado {self.cur.type.name}")
                 return None
 
-            # --- REMOVIDO O BLOCO "CORREÇÃO 3" AQUI ---
-            # Se cur é IDENT, peek já é o operador (+). Não avance!
+      
             
             # --- 2. INFIX / POSTFIX LOOP ---
             while self.peek and not self._peek_is(TokenType.SEMICOLON) and precedence < self._peek_precedence():
@@ -442,6 +445,43 @@ class Parser:
             return Index(collection, idx)
             
         return Index(collection, idx)
+
+
+    def _parse_array_literal(self):
+            # cur == LBRACKET
+            elements = []
+            
+            # Se peek for ']', é um array vazio: [] 
+            if self._peek_is(TokenType.RBRACKET):
+                self._next_token() # consume ']' into cur
+                return ArrayLiteral(elements)
+                
+            # Parse primeiro elemento
+            while True:
+                self._next_token() # cur <- token de início da expressão
+                expr = self.parse_expression() # parse a expressão do elemento
+                elements.append(expr)
+                
+                # Se o próximo token for ']', saímos
+                if self._peek_is(TokenType.RBRACKET):
+                    break
+                
+                # Se o próximo token for ',', consumimos e continuamos o loop
+                if self._peek_is(TokenType.COMMA):
+                    self._next_token() # consume ',' into cur
+                    continue # Próxima iteração consome o próximo elemento
+
+                # Se não for ']' nem ',', erro
+                self._peek_error(TokenType.RBRACKET)
+                self._synchronize()
+                return ArrayLiteral(elements) # Retorna o array incompleto
+            
+            # Consome o ']' final
+            if not self.expect_peek(TokenType.RBRACKET):
+                # O erro já foi reportado acima ou a sincronização já agiu
+                return ArrayLiteral(elements) 
+                
+            return ArrayLiteral(elements)
 
     def _parse_infix(self, left):
         # cur is the operator
