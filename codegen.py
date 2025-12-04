@@ -42,8 +42,9 @@ class LLVMCodeGenerator:
         self.builder = None
         self.function = None
         
-        # Contador para nomes únicos de blocos
+        # Contador para nomes únicos de blocos e strings
         self.block_counter = 0
+        self.string_counter = 0
         
         # Tabela de símbolos (variáveis)
         self.symbol_table = {}
@@ -655,19 +656,25 @@ class LLVMCodeGenerator:
             func_name = call.callee.name
             
             # Suporte para funções built-in
-            if func_name == "println":
+            if func_name == "println" or func_name == "print":
                 if len(call.args) == 1:
                     arg = self._generate_expression(call.args[0])
                     if arg.type.is_pointer:  # String
                         return self.builder.call(self.puts_func, [arg])
                     else:
                         # Converte número para string (simplificado - usa printf)
-                        fmt_str = "%g\n"
+                        if func_name == "println":
+                            fmt_str = "%g\n"
+                        else:
+                            fmt_str = "%g"
+                        
                         fmt_bytes = (fmt_str + '\0').encode('utf-8')
                         fmt_type = ir.ArrayType(self.int8_type, len(fmt_bytes))
                         fmt_const = ir.Constant(fmt_type, bytearray(fmt_bytes))
                         
-                        fmt_global = ir.GlobalVariable(self.module, fmt_type, name=".fmt")
+                        # Nome único para cada formato string
+                        self.string_counter += 1
+                        fmt_global = ir.GlobalVariable(self.module, fmt_type, name=f".fmt{self.string_counter}")
                         fmt_global.linkage = 'private'
                         fmt_global.global_constant = True
                         fmt_global.initializer = fmt_const
