@@ -1,0 +1,70 @@
+// Código para testar otimizações do compilador
+// Este código possui várias oportunidades de otimização
+
+function fibonacci(n) {
+    // Função recursiva - candidata a inlining em O2/O3
+    if (n <= 1) {
+        return n;
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+function calcularComplexo(x) {
+    // Expressões redundantes - candidatas a common subexpression elimination
+    var a = x * 2 + 5;
+    var b = x * 2 + 5;  // Mesma expressão que 'a'
+    var c = a + b;      // c = 2 * (x * 2 + 5)
+    
+    // Dead code - variável não usada
+    var unused = 999;
+    
+    // Constantes - candidatas a constant folding
+    var const1 = 10 + 20;  // Deve virar 30
+    var const2 = 5 * 6;    // Deve virar 30
+    
+    return c + const1 + const2;
+}
+
+function loopIneficiente() {
+    // Loop com invariantes - candidatas a loop invariant code motion
+    var result = 0;
+    var invariante = 10 * 5;  // Não muda no loop
+    
+    for (var i = 0; i < 100; i = i + 1) {
+        // Código que pode ser otimizado
+        result = result + i + invariante;
+        
+        // Operação redundante dentro do loop
+        var temp = 2 + 3;  // Sempre 5
+        result = result + temp;
+    }
+    
+    return result;
+}
+
+// Programa principal
+var numero = 8;
+
+println("=== Teste de Otimizações ===");
+
+// Teste 1: Fibonacci (recursão)
+println("Fibonacci de 8:");
+var fib_result = fibonacci(numero);
+println(fib_result);
+
+// Teste 2: Cálculo complexo (CSE, constant folding)
+println("Cálculo complexo com x=5:");
+var calc_result = calcularComplexo(5);
+println(calc_result);
+
+// Teste 3: Loop ineficiente (loop invariants)
+println("Loop ineficiente:");
+var loop_result = loopIneficiente();
+println(loop_result);
+
+// Teste 4: Operações aritméticas constantes
+var const_test = 1 + 2 + 3 + 4 + 5;  // Deve virar 15
+println("Soma constante:");
+println(const_test);
+
+println("=== Fim dos Testes ===");

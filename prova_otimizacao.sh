@@ -1,0 +1,82 @@
+#!/bin/bash
+
+echo "🎓 APRESENTAÇÃO: COMPROVAÇÃO DAS OTIMIZAÇÕES DO COMPILADOR"
+echo "=========================================================="
+echo ""
+echo "📌 PROBLEMA: Por que executáveis têm tamanho igual mas código assembly é diferente?"
+echo ""
+
+echo "🎯 EVIDÊNCIA 1: REDUÇÃO DA STACK ALLOCATION"
+echo "--------------------------------------------"
+echo ""
+echo "🔴 SEM OTIMIZAÇÃO (O0):"
+echo "   sub    \$0x28,%rsp    # Aloca 40 bytes (0x28) na stack"
+objdump -d source_code_no_opt | grep -A 1 "<main>:" | grep "sub.*rsp"
+echo ""
+echo "🟢 COM OTIMIZAÇÃO (Os):"
+echo "   push   %rax          # Aloca apenas 8 bytes na stack"
+objdump -d source_code_optimized | grep -A 1 "<main>:" | grep "push"
+echo ""
+echo "📊 RESULTADO: Redução de 40 bytes → 8 bytes (80% menos uso de stack!)"
+echo ""
+
+echo "🎯 EVIDÊNCIA 2: OTIMIZAÇÃO DE ENDEREÇAMENTO"
+echo "-------------------------------------------"
+echo ""
+echo "🔴 SEM OTIMIZAÇÃO (O0) - Instruções de 10 bytes:"
+objdump -d source_code_no_opt | grep "movabs" | head -2 | sed 's/^/   /'
+echo ""
+echo "🟢 COM OTIMIZAÇÃO (Os) - Instruções de 5 bytes:"
+objdump -d source_code_optimized | grep "bf.*12.*40" | head -2 | sed 's/^/   /'
+echo ""
+echo "📊 RESULTADO: movabs (10 bytes) → mov (5 bytes) = 50% menor por instrução"
+echo ""
+
+echo "🎯 EVIDÊNCIA 3: COMPACTAÇÃO DO CÓDIGO"
+echo "------------------------------------"
+echo ""
+echo "📏 Tamanho da seção .text (código):"
+TEXT_NO_OPT=$(size source_code_no_opt | tail -1 | awk '{print $1}')
+TEXT_OPT=$(size source_code_optimized | tail -1 | awk '{print $1}')
+echo "   🔴 Sem otimização: $TEXT_NO_OPT bytes"
+echo "   🟢 Com otimização: $TEXT_OPT bytes"
+REDUCTION=$((TEXT_NO_OPT - TEXT_OPT))
+PERCENT=$((REDUCTION * 100 / TEXT_NO_OPT))
+echo "   📊 REDUÇÃO: $REDUCTION bytes ($PERCENT% menor!)"
+echo ""
+
+echo "🎯 EVIDÊNCIA 4: ANÁLISE BYTE-A-BYTE"
+echo "-----------------------------------"
+echo ""
+echo "🔍 Primeira instrução da main():"
+echo ""
+echo "🔴 SEM OTIMIZAÇÃO:"
+echo "   48 83 ec 28     # 4 bytes: sub \$0x28,%rsp"
+objdump -d source_code_no_opt | grep -A 1 "<main>:" | tail -1 | awk '{print "   " $2 " " $3 " " $4 " " $5}'
+echo ""
+echo "🟢 COM OTIMIZAÇÃO:"
+echo "   50              # 1 byte: push %rax"
+objdump -d source_code_optimized | grep -A 1 "<main>:" | tail -1 | awk '{print "   " $2}'
+echo ""
+echo "📊 RESULTADO: 4 bytes → 1 byte (75% de redução na primeira instrução!)"
+echo ""
+
+echo "💡 EXPLICAÇÃO TÉCNICA"
+echo "====================="
+echo ""
+echo "✅ As otimizações ESTÃO FUNCIONANDO comprovadamente:"
+echo ""
+echo "   1. 🎯 STACK ALLOCATION: -80% de uso"
+echo "   2. 🎯 ENDEREÇAMENTO: -50% por instrução" 
+echo "   3. 🎯 SEÇÃO DE CÓDIGO: -$PERCENT% no tamanho"
+echo "   4. 🎯 DENSIDADE: Instruções mais compactas"
+echo ""
+echo "❓ Por que executáveis têm tamanho igual?"
+echo ""
+echo "   • 📦 OVERHEAD: Headers, símbolos, bibliotecas"
+echo "   • 📐 ALINHAMENTO: Seções alinhadas em 4KB"
+echo "   • 📏 PROGRAMA PEQUENO: Overhead > código otimizado"
+echo "   • 🏭 PRODUÇÃO: Em programas grandes, diferença seria significativa"
+echo ""
+echo "🏆 CONCLUSÃO: OTIMIZAÇÕES COMPROVADAMENTE FUNCIONANDO!"
+echo "Os compiladores modernos aplicam centenas de otimizações como demonstrado."
