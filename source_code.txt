@@ -1,24 +1,4 @@
-function multiplicar(a, b) {
-    // Parâmetros 'a' e 'b' são tratados como 'let' no escopo da função
-    if (a < 0 || b < 0) {
-        return 0; // Teste de return
-    }
-    
-    var res = a * b;
-    return res;
+var resultado = 6;
+for(var i=0;i<3;i+1){
+println("")
 }
-
-// Erro Semântico Esperado: Uso de 'res' fora da função (se inserida)
-// var x = res; 
-
-// Chamada de função
-let num1 = 5;
-let num2 = 3;
-var produto = multiplicar(num1, num2); 
-
-// Teste de chamada com literal
-var resultadoDireto = multiplicar(10, 2);
-
-// --- Erro Semântico: Return Fora de Função ---
-// Esta linha DEVE FALHAR semanticamente
- return produto;
