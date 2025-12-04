@@ -353,6 +353,21 @@ python compile.py programa.js
 # Executar o programa compilado
 ./programa      # Linux/macOS
 program.exe     # Windows
+
+#Executar o projeto
+python main.py source_code.txt
+
+#Executar programa não otimizado
+./source_code_no_opt
+
+#Executar programa otimizado
+./source_code_optimized
+
+#Gerar programa pela linguagem intermediaria
+clang source_code_no_optimization.ll -o teste.o
+
+#executar
+./teste.o
 ```
 
 ### ⚙️ **Opções Avançadas**
