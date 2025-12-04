@@ -16,6 +16,7 @@ class TokenType(Enum):
     TRUE = "TRUE"
     FALSE = "FALSE"
     VOID = "VOID"
+    NULL = "NULL"
 
     # Identificadores e Literais
     IDENT = "IDENT"  # Nomes de variáveis/funções
@@ -28,6 +29,7 @@ class TokenType(Enum):
     MINUS = "-"
     ASTERISK = "*"
     SLASH = "/"
+    MODULO = "%"
     BANG = "!"
     
     LT = "<"
@@ -51,6 +53,7 @@ class TokenType(Enum):
     LBRACKET = "["
     RBRACKET = "]"
     COMMA = ","
+    DOT = "."
     COLON = ":"
     ARROW = "->"
     SEMICOLON = ";"
@@ -80,6 +83,7 @@ keywords = {
     "true": TokenType.TRUE,
     "false": TokenType.FALSE,
     "void": TokenType.VOID,
+    "null": TokenType.NULL,
 }
 
 def lookup_ident(ident: str) -> TokenType:

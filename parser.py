@@ -8,6 +8,22 @@ from lexer import Lexer
 class Node:
     pass
 
+class WhileStmt(Node):
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+    def __repr__(self):
+        return f"While({self.condition}, {self.body})"
+
+class ForStmt(Node):
+    def __init__(self, init, condition, increment, body):
+        self.init = init
+        self.condition = condition
+        self.increment = increment
+        self.body = body
+    def __repr__(self):
+        return f"For({self.init}, {self.condition}, {self.increment}, {self.body})"
+
 class Program(Node):
     def __init__(self, statements=None):
         self.statements = statements if statements is not None else []
@@ -93,6 +109,13 @@ class Assign(Node):
         self.value = value
     def __repr__(self):
         return f"Assign({self.left}, {self.value})"
+    
+class MemberExpr(Node):
+    def __init__(self, object, property):
+        self.object = object    # Ex: Identificador 'console'
+        self.property = property # Ex: Identificador 'log'
+    def __repr__(self):
+        return f"MemberExpr({self.object}, {self.property})"
 
 class Call(Node):
     def __init__(self, callee, args):
@@ -183,6 +206,10 @@ class Parser:
             return self._parse_return()
         if self._cur_is(TokenType.IF):
             return self._parse_if()
+        if self._cur_is(TokenType.WHILE):
+            return self._parse_while()
+        if self._cur_is(TokenType.FOR):
+            return self._parse_for()
         if self._cur_is(TokenType.LBRACE):
             # O bloco precisa ser tratado como statement, mas o _parse_block já consome
             # o { em cur (que já deveria ter sido consumido antes de chamar parse_statement,
@@ -303,6 +330,128 @@ class Parser:
             
         return IfStmt(cond, then_branch, else_branch)
 
+    def _parse_while(self):
+        # cur == WHILE
+        if not self.expect_peek(TokenType.LPAREN):
+            self._synchronize()
+            return None
+        
+        self._next_token() # consome '('
+        condition = self.parse_expression()
+        
+        if not self.expect_peek(TokenType.RPAREN):
+            self._synchronize()
+            return None
+            
+        self._next_token() # vai para o início do corpo
+        body = self.parse_statement()
+        
+        return WhileStmt(condition, body)
+
+    def _parse_for(self):
+        # cur == FOR
+        if not self.expect_peek(TokenType.LPAREN):
+            self._synchronize()
+            return None
+        
+        # expect_peek já colocou o '(' em 'cur'. O próximo token (peek) é a inicialização ('let', 'var' ou expr).
+        self._next_token() # Avança 'cur' para o início da inicialização.
+        # REMOVIDO O SEGUNDO self._next_token() QUE ESTAVA AQUI E CAUSAVA O ERRO
+        
+        # 1. Inicialização
+        init = None
+        if not self._cur_is(TokenType.SEMICOLON):
+            if self._cur_is(TokenType.VAR) or self._cur_is(TokenType.CONST):
+                init = self._parse_var_decl(self.cur.literal)
+                # _parse_var_decl consome o ';', então cur é ';'.
+                if self._cur_is(TokenType.SEMICOLON):
+                     self._next_token()
+            else:
+                init = self._parse_expr_stmt()
+                if self._cur_is(TokenType.SEMICOLON):
+                     self._next_token()
+        else:
+            # Inicialização vazia
+            self._next_token() 
+            
+        # 2. Condição
+        condition = None
+        if not self._cur_is(TokenType.SEMICOLON):
+            condition = self.parse_expression()
+        
+        if not self.expect_peek(TokenType.SEMICOLON):
+            return None
+        
+        self._next_token() # Consome o ';' da condição
+        
+        # 3. Incremento
+        increment = None
+        if not self._cur_is(TokenType.RPAREN):
+            increment = self.parse_expression()
+            
+        if not self.expect_peek(TokenType.RPAREN):
+            self._synchronize()
+            return None
+            
+        self._next_token() # consome ')' e vai para o início do corpo
+        
+        body = self.parse_statement()
+        
+        return ForStmt(init, condition, increment, body)
+        # cur == FOR
+        if not self.expect_peek(TokenType.LPAREN):
+            self._synchronize()
+            return None
+        
+        self._next_token() # cur <- token '('
+        self._next_token() # cur <- primeiro token da inicialização
+        
+        # 1. Inicialização
+        init = None
+        if not self._cur_is(TokenType.SEMICOLON):
+            if self._cur_is(TokenType.VAR) or self._cur_is(TokenType.CONST):
+                init = self._parse_var_decl(self.cur.literal)
+                # _parse_var_decl consome o ';', então cur é ';'.
+                # Precisamos avançar para o início da condição
+                if self._cur_is(TokenType.SEMICOLON):
+                     self._next_token()
+            else:
+                init = self._parse_expr_stmt()
+                # Mesmo caso do var_decl
+                if self._cur_is(TokenType.SEMICOLON):
+                     self._next_token()
+        else:
+            # Inicialização vazia
+            self._next_token() # consome ';' e avança para a condição
+            
+        # 2. Condição
+        condition = None
+        if not self._cur_is(TokenType.SEMICOLON):
+            condition = self.parse_expression()
+        
+        # Esperamos o separador ';'
+        if not self.expect_peek(TokenType.SEMICOLON):
+            return None
+        
+        # Consumir o ';' da condição. 
+        # expect_peek já colocou o ';' em 'cur'. Precisamos apenas mover para o início do incremento.
+        self._next_token() # <--- APENAS UM next_token() AQUI!
+        
+        # 3. Incremento
+        increment = None
+        if not self._cur_is(TokenType.RPAREN):
+            increment = self.parse_expression()
+            
+        if not self.expect_peek(TokenType.RPAREN):
+            self._synchronize()
+            return None
+            
+        self._next_token() # consome ')' e vai para o início do corpo
+        
+        body = self.parse_statement()
+        
+        return ForStmt(init, condition, increment, body)
+
     def _parse_block(self):
         # cur == LBRACE
         # Consome '{' e chama o corpo
@@ -339,6 +488,7 @@ class Parser:
     # ------ expressions (precedence climbing) ------
     PRECD_UNARY = 8 # Precedência para operadores unários (BANG, MINUS)
     PRECD_CALL_INDEX = 9 # Precedência para operadores postfix (Call, Index)
+    PRECD_MEMBER = 10 # Precedência para operador membro (.)
 
     PRECEDENCES = {
         TokenType.ASSIGN: 1,# = (right-associative)
@@ -347,11 +497,12 @@ class Parser:
         TokenType.EQ: 4, TokenType.NOT_EQ: 4, TokenType.STRICT_EQ: 4, TokenType.STRICT_NOT_EQ: 4,
         TokenType.LT: 5, TokenType.GT: 5, TokenType.LTE: 5, TokenType.GTE: 5,
         TokenType.PLUS: 6, TokenType.MINUS: 6,
-        TokenType.ASTERISK: 7, TokenType.SLASH: 7,
+        TokenType.ASTERISK: 7, TokenType.SLASH: 7, TokenType.MODULO: 7,
         # **CORREÇÃO 5:** Adicionando precedências para Unary, Call e Index na tabela, e usando no loop
         TokenType.BANG: PRECD_UNARY, TokenType.MINUS: PRECD_UNARY,
         TokenType.LPAREN: PRECD_CALL_INDEX, # call
-        TokenType.LBRACKET: PRECD_CALL_INDEX # index access
+        TokenType.LBRACKET: PRECD_CALL_INDEX, # index access
+        TokenType.DOT: PRECD_MEMBER,
     }
 
     def parse_expression(self, precedence=0):
@@ -373,6 +524,8 @@ class Parser:
                 left = Literal(True)
             elif self._cur_is(TokenType.FALSE):
                 left = Literal(False)
+            elif self._cur_is(TokenType.NULL):
+                left = Literal(None)
             elif self._cur_is(TokenType.BANG) or self._cur_is(TokenType.MINUS):
                 op = self.cur.literal
                 self._next_token()
@@ -395,13 +548,15 @@ class Parser:
             
             # --- 2. INFIX / POSTFIX LOOP ---
             while self.peek and not self._peek_is(TokenType.SEMICOLON) and precedence < self._peek_precedence():
-                
                 if self._peek_is(TokenType.LPAREN):
                     self._next_token()
                     left = self._parse_call(left)
                 elif self._peek_is(TokenType.LBRACKET):
                     self._next_token()
                     left = self._parse_index(left)
+                elif self._peek_is(TokenType.DOT):
+                    self._next_token() # Consome o ponto
+                    left = self._parse_member_access(left)
                 else:
                     # Binário: cur é o termo esquerdo, peek é o operador.
                     # Avançamos para cur virar o operador.
@@ -433,6 +588,16 @@ class Parser:
             return Call(callee, args) # Retorna o call incompleto
             
         return Call(callee, args)
+
+    def _parse_member_access(self, obj):
+        # cur é o token DOT (.)
+        # Esperamos que o próximo seja um identificador (propriedade ou método)
+        if not self.expect_peek(TokenType.IDENT):
+            self._synchronize()
+            return obj # Retorna o objeto original se falhar
+        
+        prop = Identifier(self.cur.literal)
+        return MemberExpr(obj, prop)
 
     def _parse_index(self, collection):
         # cur == LBRACKET

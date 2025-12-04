@@ -80,6 +80,8 @@ class Lexer:
                 return self.next_token()  # Reinicia o ciclo para buscar o próximo token VÁLIDO
             else:
                 token = Token(TokenType.SLASH, '/')
+        elif self.ch == '%':
+            token = Token(TokenType.MODULO, '%')
 
         elif self.ch == '<':
             if self._peek_char() == '=':
@@ -119,6 +121,8 @@ class Lexer:
             token = Token(TokenType.COLON, ':')
         elif self.ch == ';':
             token = Token(TokenType.SEMICOLON, ';')
+        elif self.ch == '.':
+            token = Token(TokenType.DOT, '.')
         elif self.ch == '"':
             literal = self._read_string()
             token = Token(TokenType.STRING, literal)
