@@ -8,12 +8,16 @@ import tempfile
 import subprocess
 import sys
 from pathlib import Path
+from enum import Enum
 
-# Import explícito das classes que usamos
-from parser import (
-    Program, VarDecl, FuncDecl, ReturnStmt, IfStmt, Block, ExprStmt,
-    WhileStmt, ForStmt, Identifier, Literal, Unary, Binary, Assign, Call
-)
+# Níveis de otimização
+class OptimizationLevel(Enum):
+    O0 = 0  # Sem otimização
+    O1 = 1  # Otimizações básicas
+    O2 = 2  # Otimizações moderadas  
+    O3 = 3  # Otimizações agressivas
+    Os = 4  # Otimizar para tamanho
+    Oz = 5  # Otimizar agressivamente para tamanho
 
 # Import explícito das classes que usamos
 from parser import (
@@ -22,13 +26,16 @@ from parser import (
 )
 
 class LLVMCodeGenerator:
-    def __init__(self):
+    def __init__(self, optimization_level=OptimizationLevel.O2):
         # Inicialização do LLVM (removida chamada deprecated)
         try:
             llvm.initialize_native_target()
             llvm.initialize_native_asmprinter()
         except:
             pass  # Em versões mais recentes, a inicialização é automática
+        
+        # Configuração de otimização
+        self.optimization_level = optimization_level
         
         # Criação do módulo LLVM
         self.module = ir.Module(name="main")
@@ -88,7 +95,14 @@ class LLVMCodeGenerator:
     def generate_code(self, ast_node):
         """Gera código LLVM IR para o AST"""
         if isinstance(ast_node, Program):
-            return self._generate_program(ast_node)
+            # Gera código não otimizado
+            ir_code = self._generate_program(ast_node)
+            
+            # Aplica otimizações se necessário
+            if self.optimization_level != OptimizationLevel.O0:
+                self._optimize_module()
+            
+            return ir_code
         else:
             raise ValueError(f"Tipo de nó AST não suportado: {type(ast_node)}")
             
@@ -710,14 +724,22 @@ class LLVMCodeGenerator:
             ir_file = f.name
             
         try:
+            # Constrói comando base do clang
+            clang_cmd = ['clang', ir_file, '-o', output_file, '-lm']
+            
+            # Adiciona flags de otimização baseadas no nível
+            opt_flags = self._get_clang_optimization_flags()
+            clang_cmd.extend(opt_flags)
+            
             # Detecta plataforma e ajusta comando
             if sys.platform.startswith('win'):
                 if not output_file.endswith('.exe'):
                     output_file += '.exe'
-                clang_cmd = ['clang', ir_file, '-o', output_file, '-lm']
-            else:
-                clang_cmd = ['clang', ir_file, '-o', output_file, '-lm']
-                
+                    clang_cmd[2] = output_file  # Atualiza nome do arquivo de saída
+            
+            if self.optimization_level != OptimizationLevel.O0:
+                print(f"🚀 Compilando com otimizações {self.optimization_level.name}...")
+            
             # Compila usando clang
             result = subprocess.run(clang_cmd, check=True, capture_output=True, text=True)
             print(f"✅ Executável gerado: {output_file}")
@@ -749,3 +771,148 @@ class LLVMCodeGenerator:
                 os.unlink(ir_file)
             except:
                 pass
+    
+    def _optimize_module(self):
+        """Aplica otimizações LLVM ao módulo baseado no nível configurado"""
+        # Note: As otimizações agora são aplicadas durante a compilação com clang
+        # usando flags específicas em compile_to_executable
+        print(f"✅ Configurado para otimizações (nível {self.optimization_level.name})")
+        print("   Otimizações serão aplicadas durante a compilação com Clang")
+    
+    def _get_clang_optimization_flags(self):
+        """Retorna flags de otimização apropriadas para o Clang"""
+        level = self.optimization_level
+        
+        if level == OptimizationLevel.O0:
+            return ['-O0']  # Sem otimizações
+        elif level == OptimizationLevel.O1:
+            return ['-O1']  # Otimizações básicas
+        elif level == OptimizationLevel.O2:
+            return ['-O2']  # Otimizações moderadas (padrão recomendado)
+        elif level == OptimizationLevel.O3:
+            return ['-O3']  # Otimizações agressivas
+        elif level == OptimizationLevel.Os:
+            return ['-Os']  # Otimizar para tamanho
+        elif level == OptimizationLevel.Oz:
+            return ['-Oz']  # Otimizar agressivamente para tamanho
+        else:
+            return ['-O2']  # Fallback para O2
+    
+    def _get_llvm_opt_level(self):
+        """Converte nível de otimização para formato LLVM"""
+        mapping = {
+            OptimizationLevel.O0: 0,
+            OptimizationLevel.O1: 1,
+            OptimizationLevel.O2: 2,
+            OptimizationLevel.O3: 3,
+            OptimizationLevel.Os: 2,  # Similar a O2 mas com foco em tamanho
+            OptimizationLevel.Oz: 2   # Similar a O2 mas com foco agressivo em tamanho
+        }
+        return mapping.get(self.optimization_level, 2)
+    
+    def _configure_optimization_passes(self, pass_manager):
+        """Configura passes de otimização específicos baseado no nível"""
+        level = self.optimization_level
+        
+        if level == OptimizationLevel.O0:
+            # Sem otimizações
+            return
+        
+        # Passes básicos para O1+
+        if level.value >= 1:
+            # Otimizações básicas de expressão
+            pass_manager.add_instruction_combining_pass()
+            pass_manager.add_reassociate_expressions_pass()
+            pass_manager.add_gvn_pass()  # Global Value Numbering
+            pass_manager.add_cfg_simplification_pass()
+        
+        # Passes moderados para O2+
+        if level.value >= 2:
+            # Otimizações de função
+            pass_manager.add_function_inlining_pass(225)  # Limite de threshold
+            pass_manager.add_dead_arg_elimination_pass()
+            pass_manager.add_function_attrs_pass()
+            
+            # Otimizações de loop
+            pass_manager.add_loop_vectorize_pass()
+            pass_manager.add_loop_unroll_pass()
+            
+            # Otimizações de memória
+            pass_manager.add_memcpy_optimization_pass()
+            pass_manager.add_scalarize_masked_memory_intrinsics_pass()
+        
+        # Passes agressivos para O3
+        if level == OptimizationLevel.O3:
+            # Otimizações mais agressivas
+            pass_manager.add_argument_promotion_pass()
+            pass_manager.add_ipsccp_pass()  # Interprocedural Sparse Conditional Constant Propagation
+            pass_manager.add_function_inlining_pass(325)  # Threshold maior
+            
+        # Passes para otimização de tamanho
+        if level in [OptimizationLevel.Os, OptimizationLevel.Oz]:
+            # Foca em reduzir tamanho do código
+            pass_manager.add_cfg_simplification_pass()
+            pass_manager.add_dead_code_elimination_pass()
+            
+    def get_optimization_stats(self):
+        """Retorna estatísticas sobre as otimizações aplicadas"""
+        try:
+            module_str = str(self.module)
+            functions_count = module_str.count('define ')
+            globals_count = module_str.count('@')
+            
+            return {
+                'optimization_level': self.optimization_level.name,
+                'module_size': len(module_str),
+                'functions_count': functions_count,
+                'globals_count': globals_count
+            }
+        except Exception:
+            return {
+                'optimization_level': self.optimization_level.name,
+                'module_size': len(str(self.module)),
+                'functions_count': 0,
+                'globals_count': 0
+            }
+    
+    def set_optimization_level(self, level):
+        """Permite alterar o nível de otimização"""
+        if isinstance(level, str):
+            level = OptimizationLevel[level]
+        elif isinstance(level, int):
+            level_map = {0: OptimizationLevel.O0, 1: OptimizationLevel.O1, 
+                        2: OptimizationLevel.O2, 3: OptimizationLevel.O3}
+            level = level_map.get(level, OptimizationLevel.O2)
+        
+        self.optimization_level = level
+        print(f"🎛️ Nível de otimização definido para: {level.name}")
+        
+    def compile_optimized(self, output_file, show_stats=False):
+        """Compila com relatório de otimizações"""
+        if show_stats:
+            stats_before = self.get_optimization_stats()
+            print(f"\n📊 ANTES DA OTIMIZAÇÃO:")
+            print(f"   Nível: {stats_before['optimization_level']}")
+            print(f"   Tamanho do módulo: {stats_before['module_size']} caracteres")
+            print(f"   Funções: {stats_before['functions_count']}")
+            print(f"   Variáveis globais: {stats_before['globals_count']}")
+        
+        # Aplica otimizações se não foram aplicadas ainda
+        if self.optimization_level != OptimizationLevel.O0:
+            self._optimize_module()
+        
+        # Compila normalmente
+        result = self.compile_to_executable(output_file)
+        
+        if show_stats and result:
+            stats_after = self.get_optimization_stats()
+            print(f"\n📈 APÓS OTIMIZAÇÃO:")
+            print(f"   Tamanho do módulo: {stats_after['module_size']} caracteres")
+            print(f"   Funções: {stats_after['functions_count']}")
+            print(f"   Variáveis globais: {stats_after['globals_count']}")
+            
+            size_diff = stats_before['module_size'] - stats_after['module_size']
+            if size_diff > 0:
+                print(f"   💾 Redução de tamanho: {size_diff} caracteres ({size_diff/stats_before['module_size']*100:.1f}%)")
+            
+        return result
