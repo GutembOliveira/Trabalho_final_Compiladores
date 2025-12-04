@@ -497,7 +497,7 @@ class Parser:
         TokenType.EQ: 4, TokenType.NOT_EQ: 4, TokenType.STRICT_EQ: 4, TokenType.STRICT_NOT_EQ: 4,
         TokenType.LT: 5, TokenType.GT: 5, TokenType.LTE: 5, TokenType.GTE: 5,
         TokenType.PLUS: 6, TokenType.MINUS: 6,
-        TokenType.ASTERISK: 7, TokenType.SLASH: 7,
+        TokenType.ASTERISK: 7, TokenType.SLASH: 7, TokenType.MODULO: 7,
         # **CORREÇÃO 5:** Adicionando precedências para Unary, Call e Index na tabela, e usando no loop
         TokenType.BANG: PRECD_UNARY, TokenType.MINUS: PRECD_UNARY,
         TokenType.LPAREN: PRECD_CALL_INDEX, # call

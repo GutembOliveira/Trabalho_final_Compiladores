@@ -29,6 +29,7 @@ class TokenType(Enum):
     MINUS = "-"
     ASTERISK = "*"
     SLASH = "/"
+    MODULO = "%"
     BANG = "!"
     
     LT = "<"
