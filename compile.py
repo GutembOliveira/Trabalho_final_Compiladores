@@ -34,7 +34,7 @@ from tokens import TokenType, Token
 from parser import Parser
 
 # Import do backend
-from codegen import LLVMCodeGenerator
+from codegen import LLVMCodeGenerator, OptimizationLevel
 
 # Import do analisador semântico (se disponível)
 try:
@@ -95,7 +95,8 @@ def print_ast(ast_node, indent=0):
         print(f"{spacing}{node_type}: {ast_node}")
 
 def compile_file(filename, output_name=None, show_tokens=False, show_ast=False, 
-                show_ir=False, no_compile=False, debug=False):
+                show_ir=False, no_compile=False, debug=False, optimization_level=OptimizationLevel.O2,
+                show_optimize_stats=False):
     """Função principal de compilação"""
     
     # 1. LEITURA DO CÓDIGO FONTE
@@ -172,7 +173,12 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
     print("\n4️⃣ Geração de Código LLVM IR...")
     
     try:
-        code_generator = LLVMCodeGenerator()
+        code_generator = LLVMCodeGenerator(optimization_level=optimization_level)
+        
+        # Mostra informações de otimização
+        if optimization_level != OptimizationLevel.O0:
+            print(f"🎛️ Nível de otimização: {optimization_level.name}")
+        
         llvm_ir = code_generator.generate_code(ast)
         print("✅ LLVM IR gerado com sucesso")
         
@@ -205,7 +211,12 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
                 output_name += '.exe'
         
         try:
-            success = code_generator.compile_to_executable(output_name)
+            # Usa compilação otimizada se estatísticas forem solicitadas
+            if show_optimize_stats:
+                success = code_generator.compile_optimized(output_name, show_stats=True)
+            else:
+                success = code_generator.compile_to_executable(output_name)
+                
             if success:
                 print(f"🎉 Compilação CONCLUÍDA!")
                 print(f"📁 Executável: {output_name}")
@@ -254,7 +265,27 @@ Exemplos de uso:
     parser.add_argument('--debug', action='store_true', help='Modo debug (verbose)')
     parser.add_argument('--no-compile', action='store_true', help='Não compilar para executável')
     
+    # Opções de otimização
+    parser.add_argument('-O', '--optimize', choices=['0', '1', '2', '3', 's', 'z'], 
+                       default='2', help='Nível de otimização (0=sem, 1=básico, 2=moderado, 3=agressivo, s=tamanho, z=tamanho+)')
+    parser.add_argument('--optimize-stats', action='store_true', help='Mostrar estatísticas de otimização')
+    parser.add_argument('--no-optimize', action='store_true', help='Desabilita todas as otimizações (equivale a -O0)')
+    
     args = parser.parse_args()
+    
+    # Processamento do nível de otimização
+    if args.no_optimize:
+        opt_level = OptimizationLevel.O0
+    else:
+        opt_mapping = {
+            '0': OptimizationLevel.O0,
+            '1': OptimizationLevel.O1, 
+            '2': OptimizationLevel.O2,
+            '3': OptimizationLevel.O3,
+            's': OptimizationLevel.Os,
+            'z': OptimizationLevel.Oz
+        }
+        opt_level = opt_mapping.get(args.optimize, OptimizationLevel.O2)
     
     # Validações
     if not os.path.exists(args.filename):
@@ -273,7 +304,9 @@ Exemplos de uso:
         show_ast=args.ast,
         show_ir=args.ir,
         no_compile=args.no_compile,
-        debug=args.debug
+        debug=args.debug,
+        optimization_level=opt_level,
+        show_optimize_stats=args.optimize_stats
     )
     
     if success:
