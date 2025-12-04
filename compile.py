@@ -66,7 +66,7 @@ def print_tokens(source_code):
         if token.type == TokenType.EOF:
             break
     
-    print(f"\n✅ Total de tokens: {len(tokens)}")
+    print(f"\nTotal de tokens: {len(tokens)}")
     return tokens
 
 def print_ast(ast_node, indent=0):
@@ -100,16 +100,16 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
     """Função principal de compilação"""
     
     # 1. LEITURA DO CÓDIGO FONTE
-    print(f"📂 Lendo arquivo: {filename}")
+    print(f"Lendo arquivo: {filename}")
     try:
         with open(filename, 'r', encoding='utf-8') as f:
             source_code = f.read()
-        print(f"✅ Arquivo lido ({len(source_code)} caracteres)")
+        print(f"Arquivo lido ({len(source_code)} caracteres)")
     except FileNotFoundError:
-        print(f"❌ Erro: Arquivo '{filename}' não encontrado.")
+        print(f"Erro: Arquivo '{filename}' não encontrado.")
         return False
     except UnicodeDecodeError:
-        print(f"❌ Erro: Problema de encoding no arquivo '{filename}'.")
+        print(f"Erro: Problema de encoding no arquivo '{filename}'.")
         return False
 
     print("=" * 50)
@@ -127,7 +127,7 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
             token_count += 1
             if token.type == TokenType.EOF:
                 break
-        print(f"✅ Análise Léxica OK ({token_count} tokens)")
+        print(f"Análise Léxica OK ({token_count} tokens)")
     
     # 3. ANÁLISE SINTÁTICA → AST
     print("\n2️⃣ Análise Sintática...")
@@ -137,20 +137,20 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
     try:
         ast = parser.parse_program()
     except Exception as e:
-        print(f"❌ Erro durante parsing: {e}")
+        print(f"Erro durante parsing: {e}")
         return False
     
     # Verifica erros de parsing
     if len(parser.errors) > 0:
-        print(f"\n❌ ERROS SINTÁTICOS ({len(parser.errors)}):")
+        print(f"\nERROS SINTÁTICOS ({len(parser.errors)}):")
         for i, error in enumerate(parser.errors, 1):
             print(f"  {i}. {error}")
         return False
     else:
-        print("✅ Análise Sintática OK")
+        print("Análise Sintática OK")
         
     if show_ast:
-        print("\n--- 🌳 AST GERADA ---")
+        print("\n--- AST GERADA ---")
         print_ast(ast)
     
     # 4. ANÁLISE SEMÂNTICA (se disponível)
@@ -160,12 +160,12 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
         semantic_errors = analyzer.analyze(ast)
         
         if semantic_errors:
-            print(f"\n❌ ERROS SEMÂNTICOS ({len(semantic_errors)}):")
+            print(f"\nERROS SEMÂNTICOS ({len(semantic_errors)}):")
             for i, error in enumerate(semantic_errors, 1):
                 print(f"  {i}. {error}")
             return False
         else:
-            print("✅ Análise Semântica OK")
+            print("Análise Semântica OK")
     else:
         print("\n⚠️ Análise Semântica pulada (não disponível)")
     
@@ -180,7 +180,7 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
             print(f"🎛️ Nível de otimização: {optimization_level.name}")
         
         llvm_ir = code_generator.generate_code(ast)
-        print("✅ LLVM IR gerado com sucesso")
+        print("LLVM IR gerado com sucesso")
         
         if show_ir:
             print("\n--- 🔧 LLVM IR GERADO ---")
@@ -194,7 +194,7 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
             print(f"🐛 Debug: IR salvo em {ir_debug_file}")
             
     except Exception as e:
-        print(f"❌ Erro na geração de código: {e}")
+        print(f"Erro na geração de código: {e}")
         if debug:
             import traceback
             print("Stack trace:")
@@ -218,26 +218,26 @@ def compile_file(filename, output_name=None, show_tokens=False, show_ast=False,
                 success = code_generator.compile_to_executable(output_name)
                 
             if success:
-                print(f"🎉 Compilação CONCLUÍDA!")
-                print(f"📁 Executável: {output_name}")
+                print(f"Compilação CONCLUÍDA!")
+                print(f"Executável: {output_name}")
                 
                 # Instruções de execução
                 if sys.platform.startswith('win'):
-                    print(f"▶️ Para executar: {output_name}")
+                    print(f"Para executar: {output_name}")
                 else:
-                    print(f"▶️ Para executar: ./{output_name}")
+                    print(f"Para executar: ./{output_name}")
                 return True
             else:
                 return False
         except Exception as e:
-            print(f"❌ Erro na compilação final: {e}")
+            print(f"Erro na compilação final: {e}")
             if debug:
                 import traceback
                 print("Stack trace:")
                 traceback.print_exc()
             return False
     else:
-        print("\n⏹️ Compilação pulada (--no-compile)")
+        print("\nCompilação pulada (--no-compile)")
         return True
 
 def main():
@@ -289,7 +289,7 @@ Exemplos de uso:
     
     # Validações
     if not os.path.exists(args.filename):
-        print(f"❌ Erro: Arquivo '{args.filename}' não existe.")
+        print(f"Erro: Arquivo '{args.filename}' não existe.")
         sys.exit(1)
     
     # Banner
@@ -310,18 +310,18 @@ Exemplos de uso:
     )
     
     if success:
-        print(f"\n🎯 Sucesso! Arquivo '{args.filename}' compilado com sucesso.")
+        print(f"\nSucesso! Arquivo '{args.filename}' compilado com sucesso.")
         sys.exit(0)
     else:
-        print(f"\n💥 Falha! Não foi possível compilar '{args.filename}'.")
+        print(f"\nFalha! Não foi possível compilar '{args.filename}'.")
         sys.exit(1)
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n⏹️ Operação cancelada pelo usuário")
+        print("\nOperação cancelada pelo usuário")
         sys.exit(0)
     except Exception as e:
-        print(f"\n💥 Erro inesperado: {e}")
+        print(f"\nErro inesperado: {e}")
         sys.exit(1)

@@ -749,7 +749,7 @@ class LLVMCodeGenerator:
             
             # Compila usando clang
             result = subprocess.run(clang_cmd, check=True, capture_output=True, text=True)
-            print(f"✅ Executável gerado: {output_file}")
+            print(f"Executável gerado: {output_file}")
             
             # Torna executável no Linux/macOS
             if not sys.platform.startswith('win'):
@@ -757,13 +757,13 @@ class LLVMCodeGenerator:
                 
             return True
         except subprocess.CalledProcessError as e:
-            print(f"❌ Erro na compilação: {e}")
+            print(f"Erro na compilação: {e}")
             if e.stderr:
                 print(f"Stderr: {e.stderr}")
             return False
         except FileNotFoundError:
-            print("❌ Erro: clang não encontrado. Instale o clang primeiro.")
-            print("\n📦 Para instalar:")
+            print("Erro: clang não encontrado. Instale o clang primeiro.")
+            print("\nPara instalar:")
             if sys.platform.startswith('linux'):
                 print("  Ubuntu/Debian: sudo apt install clang")
                 print("  Fedora/RHEL: sudo dnf install clang")
@@ -783,7 +783,7 @@ class LLVMCodeGenerator:
         """Aplica otimizações LLVM ao módulo baseado no nível configurado"""
         # Note: As otimizações agora são aplicadas durante a compilação com clang
         # usando flags específicas em compile_to_executable
-        print(f"✅ Configurado para otimizações (nível {self.optimization_level.name})")
+        print(f"Configurado para otimizações (nível {self.optimization_level.name})")
         print("   Otimizações serão aplicadas durante a compilação com Clang")
     
     def _get_clang_optimization_flags(self):

@@ -1,90 +1,22 @@
-// Código complexo para demonstrar otimizações significativas
 
-function fibonacci(n) {
-    // Função recursiva ineficiente - boa para testar otimizações
-    if (n <= 1) {
-        return n;
-    }
-    return fibonacci(n - 1) + fibonacci(n - 2);
+// Chamada de função
+let num1 = 5.0;
+let b = 1.0;
+
+
+
+println(num1);
+
+for(var i = 0 +1; i < num1; i = i + 1){
+    b = b + 1.2;
+    println(b);
+
 }
 
-function calculoComplexo(x) {
-    // Muitas operações redundantes
-    var temp1 = x * x * x;
-    var temp2 = x * x * x;  // Redundante
-    var temp3 = x * x * x;  // Redundante
-    var temp4 = x * x * x;  // Redundante
-    
-    var resultado = temp1 + temp2 + temp3 + temp4;  // 4 * x^3
-    
-    // Operações constantes
-    var const1 = 10 + 20 + 30;
-    var const2 = 5 * 7 * 2;
-    var const3 = 100 / 4 / 2;
-    
-    return resultado + const1 + const2 + const3;
+function somar(a, b) {
+    return a + b;
 }
-
-function loopPesado() {
-    var soma = 0;
-    var multiplicador = 2 * 3 * 4;  // Constante
-    
-    for (var i = 0; i < 100; i = i + 1) {
-        // Operações redundantes dentro do loop
-        var temp = multiplicador * 2;  // Pode ser movido para fora
-        var calc = i * temp;
-        soma = soma + calc;
-        
-        // Operação desnecessária
-        var waste = 999 * 888 * 777;  // Dead code
-    }
-    
-    for (var j = 0; j < 50; j = j + 1) {
-        // Segundo loop com mais operações
-        var inner = j * j;
-        soma = soma + inner + multiplicador;
-    }
-    
-    return soma;
-}
-
-function operacoesMatematicas() {
-    // Muitas operações que podem ser otimizadas
-    var a = 1 + 2 + 3 + 4 + 5;  // = 15
-    var b = 10 * 10 * 10;       // = 1000
-    var c = 144 / 12 / 3;       // = 4
-    
-    var resultado = a * b + c;   // 15 * 1000 + 4 = 15004
-    
-    // Expressões redundantes
-    var dup1 = a * b + c;
-    var dup2 = a * b + c;
-    var dup3 = a * b + c;
-    
-    return resultado + dup1 + dup2 + dup3;  // 4 * 15004 = 60016
-}
-
-// Programa principal
-println("=== Teste de Otimizações Complexas ===");
-
-// Teste 1: Fibonacci (recursão)
-println("Fibonacci de 6:");
-var fib6 = fibonacci(6);
-println(fib6);
-
-// Teste 2: Cálculos complexos
-println("Cálculo complexo:");
-var complex = calculoComplexo(3);
-println(complex);
-
-// Teste 3: Loop pesado
-println("Loop pesado:");
-var heavy = loopPesado();
-println(heavy);
-
-// Teste 4: Operações matemáticas
-println("Operações matemáticas:");
-var math = operacoesMatematicas();
-println(math);
-
-println("=== Fim dos Testes ===");
+let resultado = somar(4,5);
+print(resultado);
+let a = 2;
+print(a);
